@@ -1,18 +1,33 @@
-import os
+ import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
-from keep_alive import keep_alive
+from flask import Flask
+from threading import Thread
 
-# تنظیمات اصلی
+# تنظیمات وب‌سایت برای نگه داشتن سرویس روشن در Render
+app_flask = Flask('')
+
+@app_flask.route('/')
+def home():
+    return "Selfbot is alive!"
+
+def run_flask():
+    app_flask.run(host='0.0.0.0', port=8080)
+
+# راه‌اندازی سرور وب در پس‌زمینه
+def keep_alive():
+    t = Thread(target=run_flask)
+    t.daemon = True
+    t.start()
+
+# تنظیمات اصلی سلف‌بات
 API_ID = 34996139
 API_HASH = "a1f3db16cae2919cfb05e61d1e968b8d"
 OWNER_ID = 7993567805
 
-# سشن استرینگ شما
 SESSION_STRING = "1BJWap1sBu53LB1uFP0WTdUjJDJQDCy4SRMvGUY-Tq8N4noeYndwg2jkrk1lHwPeFKR2VfpBfZYvIycwi9VMuxDKHwPgNe74fyGU18279ENyfgs17iHQWtsFsxkoT2VJvW-w7y5iJxZqbFe4gKlSSVJs1SCZKDmFHqg9_GQd8Bq2mTgrn6xse862nAuSlSXmhf14GKEgHJVYOIBgBuFBCNp2wfxJx1EZMtV9tAIWaeEzGID2YUdx20Kq2rju5PUoNk5H5_r4QFEAn5UeM1OO6Puq-it4SCKlcKhOd3rOrcu_ZFE9i96sUweAWsFfVclF_CbZwoZHg8tp-fvbxWqViUGYnI9sxYt4="
 
-# کانال و گروه جوین اجباری
 REQUIRED_CHANNEL = "selfqmeiwe"
 REQUIRED_GROUP = "selfqmeiw"
 
@@ -26,7 +41,6 @@ app = Client(
     session_string=SESSION_STRING
 )
 
-# تابع بررسی عضویت اجباری
 async def check_membership(client: Client, user_id: int):
     if user_id == OWNER_ID:
         return True
@@ -39,12 +53,10 @@ async def check_membership(client: Client, user_id: int):
     except Exception:
         return True
 
-# هندلر برای دستور .panel یا کلمه فارسی پنل در هر چتی
 @app.on_message(filters.command(["panel"], prefixes=".") | filters.regex(r"^پنل$"))
 async def panel_command(client: Client, message: Message):
     user_id = message.from_user.id
     
-    # بررسی عضویت
     if not await check_membership(client, user_id):
         join_text = (
             "⚠️ **برای استفاده از ربات، ابتدا باید در کانال و گروه زیر عضو شوید:**\n\n"
@@ -54,7 +66,6 @@ async def panel_command(client: Client, message: Message):
         )
         return await message.edit_text(join_text)
 
-    # متن پنل مدیریتی
     panel_text = (
         "🎛 **پنل مدیریت پیشرفته سلف‌بات** 🎛\n\n"
         "🔹 مدیریت حساب، پروفایل و ابزارهای حرفه‌ای\n"
@@ -64,8 +75,9 @@ async def panel_command(client: Client, message: Message):
     )
     await message.edit_text(panel_text)
 
-# روشن کردن سرور وب برای جلوگیری از بسته شدن توسط رندر
-keep_alive()
-
-print("سلف‌بات همراه با سرور وب با موفقیت اجرا شد...")
-app.run()
+if __name__ == "__main__":
+    # اول سرور وب را روشن می‌کنیم
+    keep_alive()
+    print("سرور وب فعال شد، در حال راه‌اندازی سلف‌‌بات...")
+    # سپس پایروگرام در ترد اصلی اجرا می‌شود
+    app.run()
