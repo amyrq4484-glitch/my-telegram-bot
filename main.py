@@ -1,4 +1,5 @@
 import os
+import asyncio
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
@@ -76,8 +77,8 @@ async def panel_command(client: Client, message: Message):
     await message.edit_text(panel_text)
 
 if __name__ == "__main__":
-    # اول سرور وب را روشن می‌کنیم
     keep_alive()
-    print("سرور وب فعال شد، در حال راه‌اندازی سلف‌‌بات...")
-    # سپس پایروگرام در ترد اصلی اجرا می‌شود
+    print("سرور وب فعال شد، در حال راه‌اندازی سلفبات...")
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     app.run()
