@@ -2,6 +2,7 @@ import os
 from pyrogram import Client, filters
 from pyrogram.types import Message
 from pyrogram.errors import UserNotParticipant
+from keep_alive import keep_alive
 
 # تنظیمات اصلی
 API_ID = 34996139
@@ -17,7 +18,7 @@ REQUIRED_GROUP = "selfqmeiw"
 
 user_balances = {}
 
-# راه‌‌اندازی کلاینت پایروگرام
+# راه‌اندازی کلاینت پایروگرام
 app = Client(
     "my_selfbot",
     api_id=API_ID,
@@ -63,5 +64,8 @@ async def panel_command(client: Client, message: Message):
     )
     await message.edit_text(panel_text)
 
-print("سلف‌بات با موفقیت اجرا شد...")
+# روشن کردن سرور وب برای جلوگیری از بسته شدن توسط رندر
+keep_alive()
+
+print("سلف‌بات همراه با سرور وب با موفقیت اجرا شد...")
 app.run()
